@@ -1,11 +1,9 @@
-from email_alert import send_email_alert
+from risk_assessment import process_violation
 
 SPEED_LIMIT = 60
-reported_overspeed = set()
 
 def reset_violation_data():
-    global reported_overspeed
-    reported_overspeed.clear()
+    pass
 
 def check_overspeed(vehicle_data, frame=None):
 
@@ -15,17 +13,10 @@ def check_overspeed(vehicle_data, frame=None):
 
         speed = data["speed"]
 
-        if speed > SPEED_LIMIT and vehicle_id not in reported_overspeed:
-
+        if speed > SPEED_LIMIT:
             print(f"⚠ Overspeed detected | Vehicle ID: {vehicle_id} | Speed: {int(speed)} km/h")
-
-            send_email_alert(
-                "⚠️ Overspeed Violation",
-                f"Vehicle {vehicle_id} exceeded speed limit",
-                frame
-            )
-
-            reported_overspeed.add(vehicle_id)
+            
+            process_violation("overspeed", vehicle_id, frame)
 
             violations.append({
                 "vehicle_id": vehicle_id,

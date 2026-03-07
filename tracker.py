@@ -3,7 +3,7 @@ from ultralytics import YOLO
 import supervision as sv
 from crash_detection import detect_crash, reset_crash_data
 from violation import check_overspeed, reset_violation_data
-from email_alert import send_email_alert
+from risk_assessment import process_violation, risk_state
 
 # load models
 vehicle_model = YOLO("yolov8n.pt")
@@ -16,6 +16,7 @@ def process_video(video_path):
     # Reset external states for new video
     reset_crash_data()
     reset_violation_data()
+    risk_state.reset_state()
 
     # open video
     cap = cv2.VideoCapture(video_path)
@@ -35,9 +36,6 @@ def process_video(video_path):
     label_annotator = sv.LabelAnnotator()
 
     TARGET_CLASSES = [0,1,2,3,5,7,16]
-
-    helmet_reported = set()
-    pothole_found = False
 
     while True:
         ret, frame = cap.read()
@@ -130,14 +128,9 @@ def process_video(video_path):
                     overlap_h = min(y2, vy2) - max(y1, vy1)
 
                     if overlap_w > 0 and overlap_h > 0:
-                        if v_id not in helmet_reported:
+                        if v_id not in risk_state.vehicle_violations or "no_helmet" not in risk_state.vehicle_violations[v_id]:
                             print(f"⚠ Helmet violation | Vehicle ID: {v_id}")
-                            send_email_alert(
-                                "⚠️ Helmet Violation",
-                                "Rider detected without helmet",
-                                frame
-                            )
-                            helmet_reported.add(v_id)
+                            process_violation("no_helmet", v_id, frame)
 
                 cv2.putText(
                     frame,
@@ -156,14 +149,9 @@ def process_video(video_path):
         for xyxy in pothole_detections.xyxy:
             x1, y1, x2, y2 = xyxy
 
-            if not pothole_found:
+            if not risk_state.pothole_reported:
                 print("⚠ Road contains potholes")
-                pothole_found = True
-                send_email_alert(
-                    "⚠️ Pothole Detected",
-                    "Road damage detected at camera location",
-                    frame
-                )
+                process_violation("pothole", None, frame)
 
             cv2.putText(
                 frame,

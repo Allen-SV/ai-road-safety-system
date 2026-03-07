@@ -1,8 +1,7 @@
-from email_alert import send_email_alert
+from risk_assessment import process_violation
 
 previous_speeds = {}
 low_speed_frames = {}
-crashed_vehicles = set()
 
 LOW_SPEED_THRESHOLD = 15
 CONFIRM_FRAMES = 5
@@ -35,10 +34,9 @@ def boxes_collide(box1, box2):
 
 
 def reset_crash_data():
-    global previous_speeds, low_speed_frames, crashed_vehicles
+    global previous_speeds, low_speed_frames
     previous_speeds.clear()
     low_speed_frames.clear()
-    crashed_vehicles.clear()
 
 def detect_crash(vehicle_data, frame=None):
 
@@ -89,18 +87,11 @@ def detect_crash(vehicle_data, frame=None):
             else:
                 low_speed_frames[vid] = 0
 
-            if low_speed_frames[vid] >= CONFIRM_FRAMES and vid not in crashed_vehicles:
-
+            if low_speed_frames[vid] >= CONFIRM_FRAMES:
                 print(f"CRASH CONFIRMED for vehicle {vid}")
-
                 
-                send_email_alert(
-                    "🚨 Accident Detected",
-                    "Crash detected at Camera 4",
-                    frame
-                )
+                process_violation("crash", vid, frame)
 
-                crashed_vehicles.add(vid)
                 low_speed_frames.pop(vid)
 
 
