@@ -81,23 +81,72 @@ git clone https://github.com/YOUR-USERNAME/AI-Road-Safety-System.git
 cd AI-Road-Safety-System
 ```
 
-3. Install dependencies
+3. (Optional but recommended) Create a virtual environment
+
+```
+python -m venv .venv
+```
+
+Activate it:
+
+**Windows (PowerShell):**
+
+```
+.\.venv\Scripts\Activate.ps1
+```
+
+4. Install dependencies
 
 ```
 pip install -r requirements.txt
 ```
 
----
-
-## ▶️ Running the Project
-
-Run the main program:
+5. Install Streamlit (if not included)
 
 ```
-python app.py
+pip install streamlit
+```
+
+
+---
+
+## ▶️ Running the Project (Web App)
+
+Run the Streamlit application:
+
+```
+python -m streamlit run app.py
+```
+
+After running, open your browser and go to:
+
+```
+http://localhost:8501
 ```
 
 The system will process the video feed and detect violations in real time.
+
+---
+
+## 🖥️ How to Use
+
+1. Upload a traffic video using the interface
+
+2. The system will process the video
+
+3. Detected objects and violations will be displayed in real time
+
+4. Alerts and analysis will be generated automatically
+
+---
+
+## ⚠️ Notes
+
+1. Ensure model files (.pt) are present in the project directory
+
+2. Large video files may take time to process
+
+3. For best performance, use a system with GPU support
 
 ---
 
