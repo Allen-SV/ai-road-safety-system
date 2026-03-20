@@ -20,8 +20,14 @@ def send_email_alert(subject, message, frame=None):
         if ret:
             msg.add_attachment(buffer.tobytes(), maintype='image', subtype='jpeg', filename='incident.jpg')
 
-    with smtplib.SMTP_SSL("smtp.gmail.com", 465) as smtp:
-        smtp.login(SENDER_EMAIL, APP_PASSWORD)
-        smtp.send_message(msg)
+    def send():
+        try:
+            with smtplib.SMTP_SSL("smtp.gmail.com", 465) as smtp:
+                smtp.login(SENDER_EMAIL, APP_PASSWORD)
+                smtp.send_message(msg)
+            print("Email alert sent")
+        except Exception as e:
+            print(f"Failed to send email alert: {e}")
 
-    print("Email alert sent")
+    import threading
+    threading.Thread(target=send, daemon=True).start()

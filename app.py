@@ -35,30 +35,39 @@ else:
     else:
         st.sidebar.error("No mp4 files found in the current directory.")
 
+if "analyze" not in st.session_state:
+    st.session_state.analyze = False
+
 # Start analysis button
 if st.sidebar.button("Start Analysis"):
+    st.session_state.analyze = True
+
+if st.session_state.analyze:
     if video_path is None or not os.path.exists(video_path):
         st.error("Please provide a valid video file.")
+        st.session_state.analyze = False
     else:
         st.success(f"Processing: {os.path.basename(video_path)}")
         
         # Create a placeholder in the UI for the video frames
         frame_placeholder = st.empty()
         
-        # Adding a stop button feature via session state
-        stop_button = st.button("Stop Analysis")
+        # Adding a stop button feature via session state properly
+        if st.button("Stop Analysis"):
+            st.session_state.analyze = False
+            st.warning("Analysis Stopped.")
+            st.stop()
         
         # Process the video stream and update the placeholder
         try:
             for frame in process_video(video_path):
-                if stop_button:
-                    st.warning("Analysis Stopped.")
-                    break
                 frame_placeholder.image(frame, channels="RGB", use_container_width=True)
-            if not stop_button:
+            if st.session_state.analyze:
                 st.success("Analysis Complete!")
+                st.session_state.analyze = False
         except Exception as e:
             st.error(f"An error occurred during processing: {e}")
+            st.session_state.analyze = False
             
         # Clean up temporary file if we uploaded one
         if source_option == "Upload New Video" and video_path is not None:
