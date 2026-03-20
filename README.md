@@ -142,11 +142,11 @@ The system will process the video feed and detect violations in real time.
 
 ## ⚠️ Notes
 
-1. Ensure model files (.pt) are present in the project directory
+* Ensure model files (.pt) are present in the project directory
 
-2. Large video files may take time to process
+* Large video files may take time to process
 
-3. For best performance, use a system with GPU support
+* For best performance, use a system with GPU support
 
 ---
 
